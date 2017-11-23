@@ -1,0 +1,17 @@
+{
+	"events":{
+		"copier":{
+			"input_edges":[
+				{"condition":"entry_point_condition"}
+			],
+			"output_edges":[
+				{"condition":"copy_resutls", "count":3}
+			]
+		}
+	},
+	"case":{
+		"entry_point_condition":{
+			"init_config":{"value":"bullet"}
+		}
+	}
+}

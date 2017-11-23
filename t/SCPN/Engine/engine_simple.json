@@ -1,0 +1,31 @@
+{
+	"events":{
+		"mover_1":{
+			"input_edges":[
+				{"condition":"entry_point_condition"}
+			],
+			"output_edges":[
+				{"condition":"moved_1"}
+			]
+		},
+		"mover_2":{
+			"input_edges":[
+				{"condition":"moved_1"}
+			],
+			"output_edges":[
+				{"condition":"moved_2"}
+			]
+		}
+	},
+	"case":{
+		"entry_point_condition":{
+			"init_config_1":{"value":"bullet"},
+			"init_config_2":{"value":"bullet"},
+			"init_config_3":{"value":"bullet"},
+			"init_config_4":{"value":"bullet"},
+			"init_config_5":{"value":"bullet"},
+			"init_config_6":{"value":"bullet"},
+			"init_config_7":{"value":"bullet"}
+		}
+	}
+}
