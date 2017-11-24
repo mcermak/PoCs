@@ -10,7 +10,7 @@ describe 'SCPN::Schema' => sub {
 		it 'from json' => sub {
 			my $schema = SCPN::Schema->new;
 			my ($events, $conditions, $bullets) =
-				$schema->build_schema_from_json("schema_basic.json");
+				$schema->build_schema_from_json("t/SCPN/schema_basic.json");
 			is($events,1, 'should create one event');
 			is($conditions,2, 'should create two conditions');
 			is($bullets,1,'should have one bullet from case');

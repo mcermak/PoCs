@@ -9,7 +9,7 @@ describe 'SCPN::Engine::Simple' => sub {
 	describe 'run' => sub {
 		it 'should make three steps' => sub {
 			my $engine = SCPN::Engine::Simple->new(
-				schema_fpath => 'engine_simple.json',
+				schema_fpath => 't/SCPN/Engine/engine_simple.json',
 				verbose => 1
 			);
 			$engine->run(5);
