@@ -1,0 +1,18 @@
+Build.PL
+lib/SCPN/Condition.pm
+lib/SCPN/Edge/CE.pm
+lib/SCPN/Edge/EC.pm
+lib/SCPN/Engine/Simple.pm
+lib/SCPN/Event.pm
+lib/SCPN/Schema.pm
+MANIFEST			This list of files
+README.md
+t/integration/basic_flow.t
+t/SCPN/Condition.t
+t/SCPN/Edge/CE.t
+t/SCPN/Edge/EC.t
+t/SCPN/Engine/engine_simple.json
+t/SCPN/Engine/Simple.t
+t/SCPN/Event.t
+t/SCPN/Schema.t
+t/SCPN/schema_basic.json
