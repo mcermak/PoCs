@@ -8,6 +8,10 @@ has name => (
 	is => 'ro',
 	required => '1'
 );
+has title => (
+	is => 'rw',
+	default => ''
+);
 has capacity => (
 	is => 'ro',
 	default => sub{ return undef }

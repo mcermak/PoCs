@@ -90,7 +90,8 @@ sub build_schema_from_hash {
 	foreach my $event_name ( keys %$schema ) {
 		$event{$event_name} = SCPN::Event->new(
 			name => $event_name,
-			$schema->{$event_name}{class} ? (execution_closure => $self->{actions}{$schema->{$event_name}{class}}) : ()
+			$schema->{$event_name}{class} ? (execution_closure => $self->{actions}{$schema->{$event_name}{class}}) : (),
+			$schema->{$event_name}{title} ? (title => $schema->{$event_name}{title}) : (),
 		);
 		my (@inputs, @outputs);
 		foreach my $edge (@{$schema->{$event_name}{input_edges}}) {
@@ -101,8 +102,10 @@ sub build_schema_from_hash {
 
 		}
 		foreach my $edge (@{$schema->{$event_name}{output_edges}}) {
-			$condition{$edge->{condition}} = SCPN::Condition->new(name=>$edge->{condition})
-				unless exists $condition{$edge->{condition}};
+			$condition{$edge->{condition}} = SCPN::Condition->new(
+				name=>$edge->{condition},
+				$schema->{conditions}{$edge->{condition}}{title} ? ( title=>$schema->{conditions}{$edge->{condition}}{title} ) : ()
+			) unless exists $condition{$edge->{condition}};
 			push @outputs, SCPN::Edge::EC->new(output_condition => $condition{$edge->{condition}})
 				foreach (1..$edge->{count} || 1);
 
