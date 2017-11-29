@@ -42,7 +42,7 @@ sub build_schema_from_json {
 
 	my $hash_schema = deserialize_from_file($fpath) || {};
 
-	my ($events, $conditions) = $self->build_schema_from_hash($hash_schema->{events});
+	my ($events, $conditions) = $self->build_schema_from_hash($hash_schema);
 	my ($bullets) = $self->load_case_from_hash($hash_schema->{case});
 
 	return ($events, $conditions, $bullets);
@@ -87,23 +87,26 @@ sub build_schema_from_hash {
 	return unless $schema or ref $schema ne 'HASH';
 
 	my (%condition,%event);
-	foreach my $event_name ( keys %$schema ) {
+	my $events = $schema->{events};
+	foreach my $event_name ( keys %{$events} ) {
 		$event{$event_name} = SCPN::Event->new(
 			name => $event_name,
-			$schema->{$event_name}{class} ? (execution_closure => $self->{actions}{$schema->{$event_name}{class}}) : (),
-			$schema->{$event_name}{title} ? (title => $schema->{$event_name}{title}) : (),
+			$events->{$event_name}{class} ? (execution_closure => $self->{actions}{$events->{$event_name}{class}}) : (),
+			$events->{$event_name}{title} ? (title => $events->{$event_name}{title}) : (),
 		);
 		my (@inputs, @outputs);
-		foreach my $edge (@{$schema->{$event_name}{input_edges}}) {
-			$condition{$edge->{condition}} = SCPN::Condition->new(name=>$edge->{condition})
-				unless exists $condition{$edge->{condition}};
+		foreach my $edge (@{$events->{$event_name}{input_edges}}) {
+			$condition{$edge->{condition}} = SCPN::Condition->new(
+				name=>$edge->{condition},
+				$schema->{conditions}{$edge->{condition}}{title} ? ( title=>$schema->{conditions}{$edge->{condition}}{title} ) : ()
+			) unless exists $condition{$edge->{condition}};
 			push @inputs, SCPN::Edge::CE->new(
 				exists $edge->{colors} ? ('colors' => $edge->{colors}) : (),
 				input_condition => $condition{$edge->{condition}}
 			) foreach (1..$edge->{count} || 1);
 
 		}
-		foreach my $edge (@{$schema->{$event_name}{output_edges}}) {
+		foreach my $edge (@{$events->{$event_name}{output_edges}}) {
 			$condition{$edge->{condition}} = SCPN::Condition->new(
 				name=>$edge->{condition},
 				$schema->{conditions}{$edge->{condition}}{title} ? ( title=>$schema->{conditions}{$edge->{condition}}{title} ) : ()
