@@ -36,14 +36,14 @@ sub list_items {
 
 	my ($color) = map $params{$_}, qw/color/;
 	$color //= 'default';
-	
-	return keys %{$self->{multiset}{$color}} or ();
+
+	return keys %{$self->{multiset}{$color}};
 }
 
 sub list_colors {
 	my( $self ) = @_;
 
-	return keys %{$self->{multiset}} or ();
+	return keys %{$self->{multiset}};
 }
 
 sub get_item {
