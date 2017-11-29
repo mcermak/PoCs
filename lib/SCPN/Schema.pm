@@ -97,8 +97,10 @@ sub build_schema_from_hash {
 		foreach my $edge (@{$schema->{$event_name}{input_edges}}) {
 			$condition{$edge->{condition}} = SCPN::Condition->new(name=>$edge->{condition})
 				unless exists $condition{$edge->{condition}};
-			push @inputs, SCPN::Edge::CE->new(input_condition => $condition{$edge->{condition}})
-				foreach (1..$edge->{count} || 1);
+			push @inputs, SCPN::Edge::CE->new(
+				exists $edge->{colors} ? ('colors' => $edge->{colors}) : (),
+				input_condition => $condition{$edge->{condition}}
+			) foreach (1..$edge->{count} || 1);
 
 		}
 		foreach my $edge (@{$schema->{$event_name}{output_edges}}) {

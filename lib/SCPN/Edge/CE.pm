@@ -14,6 +14,15 @@ has input_condition => (
 	},
 	required => 1,
 );
+has colors => (
+	is => 'rw',
+	isa => sub {
+		return unless defined $_[0];
+		Mojo::Exception->throw("CE: colors constraint fails.")
+			if ref $_[0] ne 'ARRAY';
+	},
+	default => sub {[]}
+);
 
 sub prepared_items {
 	my ($self) = @_;
