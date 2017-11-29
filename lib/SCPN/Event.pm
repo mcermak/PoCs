@@ -31,6 +31,11 @@ has values => (
 	default => sub{[]}
 );
 
+has execution_closure => (
+	is => 'ro',
+	default => sub { \&propagate_first }
+);
+
 sub consume_input {
 	my ($self) = @_;
 	my @edges = @{$self->input_edges};
@@ -46,16 +51,16 @@ sub consume_input {
 	return 1;
 }
 
-sub do {
-	my ($self) = @_;
+sub propagate_first {
+	my (@values) = @_;
 
-	return @{$self->{values}};
+	return $values[0] || undef;
 }
 
 sub fire {
 	my ($self) = @_;
 	return 0 unless $self->consume_input;
-	my ($first_val) = $self->do;
+	my ($first_val) = $self->execution_closure->(@{$self->{values}});
 
 	$self->send_result( $first_val || "bullet" );
 	
