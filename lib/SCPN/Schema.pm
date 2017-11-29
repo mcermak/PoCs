@@ -32,6 +32,11 @@ has conditions => (
 	default => sub {return {}}
 );
 
+has actions => (
+	is => 'rw',
+	default => sub { {} }
+);
+
 sub build_schema_from_json {
 	my ($self, $fpath) = @_;
 
@@ -83,7 +88,10 @@ sub build_schema_from_hash {
 
 	my (%condition,%event);
 	foreach my $event_name ( keys %$schema ) {
-		$event{$event_name} = SCPN::Event->new( name => $event_name );
+		$event{$event_name} = SCPN::Event->new(
+			name => $event_name,
+			$schema->{$event_name}{class} ? (execution_closure => $self->{actions}{$schema->{$event_name}{class}}) : ()
+		);
 		my (@inputs, @outputs);
 		foreach my $edge (@{$schema->{$event_name}{input_edges}}) {
 			$condition{$edge->{condition}} = SCPN::Condition->new(name=>$edge->{condition})

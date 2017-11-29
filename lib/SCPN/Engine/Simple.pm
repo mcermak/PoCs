@@ -12,6 +12,11 @@ has schema_fpath => (
 	required => 1
 );
 
+has actions => (
+	is => 'ro',
+	default => sub {{}}
+);
+
 has petri_net => (
 	is => 'ro',
 	builder => '_build_petri_net',
@@ -30,7 +35,7 @@ has verbose => (
 sub _build_petri_net {
 	my ($self) = @_;
 
-	my $schema = SCPN::Schema->new;
+	my $schema = SCPN::Schema->new( actions => $self->actions );
 	$schema->build_schema_from_json($self->schema_fpath);
 
 	return $schema;
@@ -47,10 +52,10 @@ sub _step {
 
 	my $event_name = $keys->[int(rand($events))];
 	print "Starting $event_name\n" if $self->verbose;
-	return $self->petri_net->events->{$event_name}->fire;
-	print "Finished $event_name\n" if $self->verbose;
+	my $return = $self->petri_net->events->{$event_name}->fire;
+	print "Finished $event_name with $return\n" if $self->verbose;
 
-	return 1;
+	return $return;
 }
 
 sub run {
