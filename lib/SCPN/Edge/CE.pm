@@ -27,7 +27,7 @@ has colors => (
 sub prepared_items {
 	my ($self) = @_;
 
-	!! $self->input_condition->list_items();
+	!! map $self->input_condition->list_items( defined $_ ? (color => $_) : () ), ( @{$self->colors} || undef );
 }
 
 sub bring_items {
@@ -35,7 +35,7 @@ sub bring_items {
 
 	return unless $self->input_condition;
 
-	my @item = $self->input_condition->list_items();
+	my @item = map $self->input_condition->list_items( defined $_ ? (color => $_) : () ), ( @{$self->colors} || undef );
 
 	Mojo::Exception->throw("Event: ".$self->input_condition->name." is not prepared.")
 		unless scalar @item;

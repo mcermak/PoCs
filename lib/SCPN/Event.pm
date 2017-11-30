@@ -68,7 +68,6 @@ sub consume_input {
 
 sub propagate_first {
 	my (@values) = @_;
-
 	return $values[0] || undef;
 }
 
