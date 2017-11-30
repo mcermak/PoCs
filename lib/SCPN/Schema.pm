@@ -91,7 +91,9 @@ sub build_schema_from_hash {
 	foreach my $event_name ( keys %{$events} ) {
 		$event{$event_name} = SCPN::Event->new(
 			name => $event_name,
-			$events->{$event_name}{class} ? (execution_closure => $self->{actions}{$events->{$event_name}{class}}) : (),
+			$events->{$event_name}{class} && $self->{actions}{$events->{$event_name}{class}}
+				? (execution_closure => $self->{actions}{$events->{$event_name}{class}})
+				: (),
 			$events->{$event_name}{title} ? (title => $events->{$event_name}{title}) : (),
 		);
 		my (@inputs, @outputs);
