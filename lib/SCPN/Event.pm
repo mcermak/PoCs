@@ -40,6 +40,17 @@ has execution_closure => (
 	default => sub { \&propagate_first }
 );
 
+sub is_active {
+	my ($self) = @_;
+	my @edges = @{$self->input_edges};
+
+	foreach my $e (@edges) {
+		return 0 unless $e->prepared_items;
+	}
+
+	return 1;
+}
+
 sub consume_input {
 	my ($self) = @_;
 	my @edges = @{$self->input_edges};
