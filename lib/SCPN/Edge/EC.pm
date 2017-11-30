@@ -16,13 +16,14 @@ has output_condition => (
 );
 
 sub send {
-	my ($self, $item) = @_;
+	my ($self, $item, $color) = @_;
 
 	return unless $self->output_condition;
 
 	$self->output_condition->add_item(
 		item_id => generate_item_id(),
-		item => $item
+		item => $item,
+		defined $color ? ( color => $color ) : ()
 	);
 
 	return 1;

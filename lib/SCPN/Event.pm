@@ -75,17 +75,17 @@ sub propagate_first {
 sub fire {
 	my ($self) = @_;
 	return 0 unless $self->consume_input;
-	my ($first_val) = $self->execution_closure->(@{$self->{values}});
+	my ($first_val, $color) = $self->execution_closure->(@{$self->{values}});
 
-	$self->send_result( $first_val || "bullet" );
+	$self->send_result( $first_val || "bullet", $color );
 	
 	return 1;
 }
 
 sub send_result {
-	my ($self, $result) = @_;
+	my ($self, $result, $color) = @_;
 
-	$_->send( $result ) foreach @{$self->{output_edges}};
+	$_->send( $result, $color ) foreach @{$self->{output_edges}};
 
 	return 1;
 }
