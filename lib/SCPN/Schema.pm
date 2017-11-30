@@ -61,7 +61,8 @@ sub load_case_from_hash {
 		foreach my $item_id (keys %{$case->{$condition_name}}) {
 			$self->conditions->{$condition_name}->add_item(
 				item_id => $item_id,
-				item => $case->{$condition_name}{$item_id}{value}
+				item => $case->{$condition_name}{$item_id}{value},
+				color => $case->{$condition_name}{$item_id}{color},
 			);
 			$counter++;
 		}
