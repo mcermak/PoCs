@@ -27,7 +27,12 @@ has colors => (
 sub prepared_items {
 	my ($self) = @_;
 
-	!! map $self->input_condition->list_items( defined $_ ? (color => $_) : () ), ( @{$self->colors} || undef );
+	my @items;
+	foreach my $color (@{$self->colors}) {
+		push @items, $self->input_condition->list_items('color' => $color);
+	}
+	return !! @items if @{$self->colors};
+	return !! $self->input_condition->list_items;
 }
 
 sub bring_items {
@@ -35,13 +40,26 @@ sub bring_items {
 
 	return unless $self->input_condition;
 
-	my @item = map $self->input_condition->list_items( defined $_ ? (color => $_) : () ), ( @{$self->colors} || undef );
+	my @items;
+	if (@{$self->colors}) {
+		foreach my $color (@{$self->colors}) {
+			push @items, map { [$_, $color] } $self->input_condition->list_items('color' => $color);
+		}
+	} else {
+		push @items, map { [$_, 'default'] } $self->input_condition->list_items;
+	}
 
 	Mojo::Exception->throw("Event: ".$self->input_condition->name." is not prepared.")
-		unless scalar @item;
+		unless scalar @items;
 
-	my $item = $self->input_condition->get_item( item_id => $item[0] );
-	$self->input_condition->delete_item( item_id => $item[0] );
+	my $item = $self->input_condition->get_item(
+		item_id => $items[0][0],
+		color => $items[0][1],
+	 );
+	$self->input_condition->delete_item(
+		item_id => $items[0][0],
+		color => $items[0][1],
+	);
 
 	return $item;
 }
