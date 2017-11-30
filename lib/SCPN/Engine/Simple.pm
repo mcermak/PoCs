@@ -51,6 +51,8 @@ sub _step {
 		unless $events;
 
 	my $event_name = $keys->[int(rand($events))];
+	return unless $self->petri_net->events->{$event_name}->is_active;
+
 	print "Starting $event_name\n" if $self->verbose;
 	my $return = $self->petri_net->events->{$event_name}->fire;
 	print "Finished $event_name with $return\n" if $self->verbose;
