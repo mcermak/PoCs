@@ -77,7 +77,7 @@ describe 'Petri Net basic flow' => sub {
 		};
 		it 'fire when both conditions are satisfied' => sub {
 			my $condition = SCPN::Condition->new(
-				name => 'intput_condition'
+				name => 'intput_condition_1'
 			);
 
 			$condition->add_item(
@@ -90,7 +90,7 @@ describe 'Petri Net basic flow' => sub {
 			);
 
 			my $condition_2 = SCPN::Condition->new(
-				name => 'intput_condition'
+				name => 'intput_condition_2'
 			);
 
 			$condition_2->add_item(

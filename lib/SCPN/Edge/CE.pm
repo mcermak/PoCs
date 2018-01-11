@@ -21,24 +21,30 @@ has colors => (
 		Mojo::Exception->throw("CE: colors constraint fails.")
 			if ref $_[0] ne 'ARRAY';
 	},
-	default => sub {[]}
+	default => sub {[]},
+);
+has width => (
+	is => 'rw',
+	default => 1
 );
 
 sub prepared_items {
-	my ($self) = @_;
+	my ($self, $count) = @_;
+	$count //= 1;
 
 	my @items;
 	foreach my $color (@{$self->colors}) {
 		push @items, $self->input_condition->list_items('color' => $color);
 	}
-	return !! @items if @{$self->colors};
-	return !! $self->input_condition->list_items;
+	return scalar @items >= $count if @{$self->colors};
+	return scalar $self->input_condition->list_items >= $count;
 }
 
 sub bring_items {
-	my ($self) = @_;
+	my ($self, $count) = @_;
 
 	return unless $self->input_condition;
+	$count //= 1;
 
 	my @items;
 	if (@{$self->colors}) {
@@ -52,16 +58,19 @@ sub bring_items {
 	Mojo::Exception->throw("Event: ".$self->input_condition->name." is not prepared.")
 		unless scalar @items;
 
-	my $item = $self->input_condition->get_item(
-		item_id => $items[0][0],
-		color => $items[0][1],
-	 );
-	$self->input_condition->delete_item(
-		item_id => $items[0][0],
-		color => $items[0][1],
-	);
+	my @r_items;
+	foreach (0..$count-1) {
+		push @r_items, $self->input_condition->get_item(
+			item_id => $items[$_][0],
+			color => $items[$_][1],
+		 );
+		$self->input_condition->delete_item(
+			item_id => $items[$_][0],
+			color => $items[$_][1],
+		);
+	}
 
-	return $item;
+	return @r_items;
 }
 
 1;

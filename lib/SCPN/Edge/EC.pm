@@ -15,6 +15,11 @@ has output_condition => (
 	default => sub { return undef }
 );
 
+has width => (
+	is => 'rw',
+	default => 1,
+);
+
 sub send {
 	my ($self, $item, $color) = @_;
 

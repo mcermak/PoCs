@@ -12,18 +12,18 @@ describe 'SCPN::Edge::CE' => sub {
 		it 'should throw exception when not input condition'=> sub {
 			throws_ok{ SCPN::Edge::CE->new() } qr/input_condition/;
 		};
-		it "should return one structure" => sub {
+		it "should return two structures" => sub {
 			my $condition = bless {}, "SCPN::Condition";
 			SCPN::Condition->expects("list_items")->once->returns( ("A", "B") );
-			SCPN::Condition->expects("get_item")->once->returns( sub {
+			SCPN::Condition->expects("get_item")->exactly(2)->returns( sub {
 				my ($self, %item) = @_;
 				my $item_id = $item{item_id};
 				is( $item_id eq "A" || $item_id eq "B", 1, "item should be A or B" );
 				return "C"
 			});
-			SCPN::Condition->expects("delete_item")->once;
+			SCPN::Condition->expects("delete_item")->exactly(2);
 			$edge = SCPN::Edge::CE->new( input_condition => $condition );
-			is( $edge->bring_items, "C" );
+			is_deeply( [ $edge->bring_items(2) ], ["C", "C"] );
 		};
 		it "should return no result when no bullet in condition" => sub {
 			my $condition = bless {}, "SCPN::Condition";
@@ -38,7 +38,7 @@ describe 'SCPN::Edge::CE' => sub {
 			SCPN::Condition->expects("get_item")->once->returns("blahblah");
 			SCPN::Condition->expects("delete_item")->once->returns();
 			$edge = SCPN::Edge::CE->new( input_condition => $condition );
-			is( $edge->bring_items, "blahblah" );
+			is_deeply( [$edge->bring_items], ["blahblah"] );
 		};
 	};
 };
