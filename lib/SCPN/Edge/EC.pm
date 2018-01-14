@@ -3,6 +3,7 @@ package SCPN::Edge::EC;
 use Moo;
 use namespace::clean;
 use Mojo::Exception;
+use Storable qw/dclone/;
 
 has output_condition => (
 	is => 'rw',
@@ -25,11 +26,19 @@ sub send {
 
 	return unless $self->output_condition;
 
-	$self->output_condition->add_item(
-		item_id => generate_item_id(),
-		item => $item,
-		defined $color ? ( color => $color ) : ()
-	);
+	if( ref $item ) {
+		$self->output_condition->add_item(
+			item_id => generate_item_id(),
+			item => dclone( $item ),
+			defined $color ? ( color => $color ) : ()
+		) foreach (1..$self->width);
+	} else {
+		$self->output_condition->add_item(
+			item_id => generate_item_id(),
+			item => $item,
+			defined $color ? ( color => $color ) : ()
+		) foreach (1..$self->width);
+	}
 
 	return 1;
 }

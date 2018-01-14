@@ -34,14 +34,24 @@ describe 'SCPN::Event' => sub {
 			ok( $event->fire );
 		};
 		it 'fire with output edges' => sub {
-			SCPN::Edge::EC->expects("send")->exactly(2)->returns( sub { 
+			SCPN::Edge::EC->expects("send")->exactly(1)->returns( sub {
 					my ( $self, $item ) = @_;
 					is( $item, "bullet", "output should be ok" );
 					return "bullet";
 			});
 			my $ce1 = bless {}, "SCPN::Edge::EC";
 			my $ce2 = bless {}, "SCPN::Edge::EC";
+			SCPN::Edge::EC->expects("output_condition")->exactly(2)->returns(bless{}, "SCPN::Condition");
+			my $width = 1;
+			SCPN::Edge::EC->expects("width")->exactly(3)->returns(
+				sub{
+					my ($self, $value) = @_;
+					$value ? $width = $value : return $width;
+				}
+			);
+			SCPN::Condition->expects("name")->exactly(2)->returns("name");
 			$event->output_edges([$ce1,$ce2]);
+			is( $width, 2, 'construction should reduce edges to one with width = 2' );
 			ok( $event->fire );
 		};
 		it 'fire with input and output edges' => sub {
@@ -54,14 +64,25 @@ describe 'SCPN::Event' => sub {
 
 			$event->input_edges([$ce]);
 
-			SCPN::Edge::EC->expects("send")->exactly(2)->returns( sub { 
+			SCPN::Edge::EC->expects("send")->exactly(1)->returns( sub {
 					my ( $self, $item ) = @_;
 					is_deeply( $item, "my_bullet", "output should be ok" );
 					return "bullet";
 			});
+
 			my $ec1 = bless {}, "SCPN::Edge::EC";
 			my $ec2 = bless {}, "SCPN::Edge::EC";
+			SCPN::Edge::EC->expects("output_condition")->exactly(2)->returns(bless{}, "SCPN::Condition");
+			my $width = 1;
+			SCPN::Edge::EC->expects("width")->exactly(3)->returns(
+				sub{
+					my ($self, $value) = @_;
+					$value ? $width = $value : return $width;
+				}
+			);
+			SCPN::Condition->expects("name")->exactly(2)->returns("name");
 			$event->output_edges([$ec1,$ec2]);
+
 			ok( $event->fire );
 		};
 	};

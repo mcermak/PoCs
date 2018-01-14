@@ -30,7 +30,8 @@ has output_edges => (
 		Mojo::Exception->throw("Event: output edges constraint fails.")
 			if not ref $_[0] eq 'ARRAY' or grep(not $_->isa('SCPN::Edge::EC'),@$_[0]);
 	},
-	default => sub {[]}
+	default => sub {[]},
+	trigger => \&clean_output_edges
 );
 has values => (
 	is => 'rw',
@@ -57,6 +58,24 @@ sub clean_input_edges {
 		}
 	}
 	$self->{input_edges} = \@edges;
+	return 1;
+};
+
+sub clean_output_edges {
+	my ($self, $edges) = @_;
+	my (%edges, @edges);
+
+	foreach my $edge (@$edges) {
+		my $name = $edge->output_condition->name;
+		if ($edges{$name}) {
+			my $new_width = $edges{$name}->width + $edge->width;
+			$edges{$name}->width($new_width);
+		} else {
+			$edges{$name} = $edge;
+			push @edges, $edge;
+		}
+	}
+	$self->{output_edges} = \@edges;
 	return 1;
 };
 
@@ -102,11 +121,7 @@ sub fire {
 sub send_result {
 	my ($self, $result, $color) = @_;
 
-	if (ref $result) {
-		$_->send( dclone($result), $color ) foreach @{$self->{output_edges}};
-	} else {
-		$_->send( $result, $color ) foreach @{$self->{output_edges}};
-	}
+	$_->send( $result, $color ) foreach @{$self->{output_edges}};
 
 	return 1;
 }
