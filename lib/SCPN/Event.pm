@@ -18,7 +18,7 @@ has input_edges => (
 	isa => sub {
 		return unless defined $_[0];
 		Mojo::Exception->throw("Event: input edges constraint fails.")
-			if not ref $_[0] eq 'ARRAY' or grep(not $_->isa('SCPN::Edge::CE'),@$_[0]);
+			if (not ref $_[0] eq 'ARRAY') || (grep { not $_->isa('SCPN::Edge::CE')} @{$_[0]});
 	},
 	default => sub {[]},
 	trigger => \&clean_input_edges
@@ -28,7 +28,7 @@ has output_edges => (
 	isa => sub {
 		return unless defined $_[0];
 		Mojo::Exception->throw("Event: output edges constraint fails.")
-			if not ref $_[0] eq 'ARRAY' or grep(not $_->isa('SCPN::Edge::EC'),@$_[0]);
+			if (not ref $_[0] eq 'ARRAY') || (grep { not $_->isa('SCPN::Edge::EC') } @{$_[0]});
 	},
 	default => sub {[]},
 	trigger => \&clean_output_edges

@@ -17,7 +17,7 @@ has events => (
 	isa => sub {
 		return unless defined $_[0];
 		Mojo::Exception->throw("SCPN::Schema: event constraint fails.")
-			if not ref $_[0] eq 'HASH' or grep(not $_->isa('SCPN::Event'), values %{$_[0]});
+			if (not ref $_[0] eq 'HASH') || (grep { not $_->isa('SCPN::Event') } values %{$_[0]});
 	},
 	default => sub {return {}}
 );
@@ -27,7 +27,7 @@ has conditions => (
 	isa => sub {
 		return unless defined $_[0];
 		Mojo::Exception->throw("SCPN::Schema: input event constraint fails.")
-			if not ref $_[0] eq 'HASH' or grep(not $_->isa('SCPN::Condition'), values %{$_[0]});
+			if (not ref $_[0] eq 'HASH') || grep {not $_->isa('SCPN::Condition') } values %{$_[0]};
 	},
 	default => sub {return {}}
 );
