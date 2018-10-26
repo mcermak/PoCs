@@ -6,6 +6,10 @@ use namespace::clean;
 use feature 'state';
 
 use SCPN::Schema;
+use Time::HiRes qw/time/;
+use JSON::XS;
+use Statistics::Basic;
+use List::Util;
 
 has schema_fpath => (
 	is => 'ro',
@@ -32,6 +36,34 @@ has verbose => (
 	default => 0
 );
 
+has stats => (
+	is => 'rw',
+	default => sub { +{ stats => {} } },
+);
+
+my $stats_method = {
+	avg => \&mean,
+	min => \&List::Util::min,
+	max => \&List::Util::max,
+	median => \&median,
+	count => sub { return scalar @_ }
+};
+
+sub median {
+	my (@values) = @_;
+	return Statistics::Basic::median(@values)->query
+}
+
+sub mean {
+	my (@values) = @_;
+	return Statistics::Basic::mean(@values)->query
+}
+
+sub add_stats {
+	my ($self, $name, $value ) = @_;
+	push @{$self->stats->{stats}{$name}}, $value;
+}
+
 sub _build_petri_net {
 	my ($self) = @_;
 
@@ -41,7 +73,7 @@ sub _build_petri_net {
 	return $schema;
 }
 
-sub _step {
+sub step {
 	my ($self) = @_;
 
 	state $keys = [ keys %{ $self->petri_net->events } ];
@@ -54,7 +86,12 @@ sub _step {
 	return unless $self->petri_net->events->{$event_name}->is_active;
 
 	print "Starting $event_name\n" if $self->verbose;
+
+	my $start = time();
 	my $return = $self->petri_net->events->{$event_name}->fire;
+	$self->add_stats( $event_name, sprintf('%0.3f', time() - $start ) )
+		if $return;
+
 	print "Finished $event_name with $return\n" if $self->verbose;
 
 	return $return;
@@ -64,12 +101,26 @@ sub run {
 	my ($self, $steps) = @_;
 
 	if($steps) {
-		$self->_step && $steps-- while($steps>0);
+		$self->step && $steps-- while($steps>0);
 	} else {
 		while (1) {
-			$self->_step
+			$self->step
 		}
 	}
 }
+
+sub print_statistics {
+	my ($self, $fh, @measurements) = @_;
+
+	my $restats;
+	foreach my $event ( keys %{ $self->stats->{stats} } ) {
+		my @items = @{$self->stats->{stats}{$event}};
+		foreach my $method ( @measurements ) {
+			$restats->{$event}{$method} = $stats_method->{$method}->(@items);
+		}
+	}
+	print $fh JSON::XS->new->pretty->encode($restats);
+}
+
 
 1;
